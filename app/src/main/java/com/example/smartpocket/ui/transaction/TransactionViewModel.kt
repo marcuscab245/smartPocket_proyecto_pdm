@@ -39,6 +39,33 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
         }
     }
 
+    fun updateTransaction(
+        id: Int,
+        amount: Double,
+        description: String,
+        category: String,
+        priority: String,
+        isIncome: Boolean,
+        dateMillis: Long
+    ) {
+        viewModelScope.launch {
+            val updatedTransaction = TransactionEntity(
+                id = id,
+                amount = amount,
+                description = description,
+                category = category,
+                priority = priority,
+                isIncome = isIncome,
+                dateMillis = dateMillis
+            )
+            repository.update(updatedTransaction)
+        }
+    }
+
+    fun getTransactionById(id: Int): TransactionEntity? {
+        return transactions.value.find { it.id == id }
+    }
+
     fun deleteTransaction(transaction: TransactionEntity) {
         viewModelScope.launch {
             repository.delete(transaction)

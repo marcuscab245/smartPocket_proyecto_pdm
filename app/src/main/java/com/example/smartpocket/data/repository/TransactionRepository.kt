@@ -14,7 +14,15 @@ class TransactionRepository(private val transactionDao: TransactionDao) {
         transactionDao.insertTransaction(transaction)
     }
 
+    suspend fun update(transaction: TransactionEntity) {
+        transactionDao.updateTransaction(transaction)
+    }
+
     suspend fun delete(transaction: TransactionEntity) {
         transactionDao.deleteTransaction(transaction)
+    }
+
+    fun getTransactionsInRange(start: Long, end: Long): Flow<List<TransactionEntity>> {
+        return transactionDao.getTransactionsByDateRange(start, end)
     }
 }

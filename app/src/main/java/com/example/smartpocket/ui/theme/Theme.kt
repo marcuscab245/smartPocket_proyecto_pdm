@@ -1,42 +1,34 @@
 package com.example.smartpocket.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-
-private val LightColorScheme = lightColorScheme(
-    primary = PrimaryGreen,
-    onPrimary = White,
-    secondary = ForestGreen,
-    onSecondary = White,
-    background = LightMint,
-    surface = White,
-    onBackground = DarkCharcoal,
-    onSurface = DarkCharcoal
-)
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = LightMint,
-    onPrimary = DarkCharcoal,
-    secondary = PrimaryGreen,
-    onSecondary = White,
-    background = DarkCharcoal,
-    surface = ForestGreen,
-    onBackground = LightMint,
-    onSurface = LightMint
+    primary = LavenderAccent,
+    onPrimary = DeepBlack,
+    secondary = LavenderText,
+    onSecondary = DeepBlack,
+    background = DeepBlack,
+    surface = DeepBlack,
+    onBackground = PureWhite,
+    onSurface = PureWhite,
+    surfaceVariant = CardGrey,
+    onSurfaceVariant = SecondaryText,
+    outline = BorderGrey,
+    error = InnecesarioRed,
+    errorContainer = InnecesarioRedContainer,
+    onErrorContainer = InnecesarioRed
 )
 
 @Composable
 fun SmartPocketTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
+    // Forzamos el tema oscuro para mantener la estética Beta Stitch
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = DarkColorScheme,
         typography = Typography,
         content = content
     )
