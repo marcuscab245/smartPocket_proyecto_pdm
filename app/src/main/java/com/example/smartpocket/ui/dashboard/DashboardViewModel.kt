@@ -3,14 +3,16 @@ package com.example.smartpocket.ui.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.smartpocket.data.repository.ExchangeRateRepository
 import com.example.smartpocket.data.repository.TransactionRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class DashboardViewModel(private val repository: TransactionRepository) : ViewModel() {
+class DashboardViewModel(
+    private val repository: TransactionRepository,
+    private val exchangeRateRepository: ExchangeRateRepository = ExchangeRateRepository()
+) : ViewModel() {
 
     val impulsivityCost: StateFlow<Double> = repository.unnecessaryExpenses
         .map { list -> list.sumOf { it.amount } }
@@ -53,6 +55,43 @@ class DashboardViewModel(private val repository: TransactionRepository) : ViewMo
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = 0.0
         )
+
+    val expensesByCategory: StateFlow<Map<String, Double>> = repository.allTransactions
+        .map { list ->
+            list.filter { !it.isIncome }
+                .groupBy { it.category }
+                .mapValues { entry -> entry.value.sumOf { it.amount } }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
+
+    private val _convertedImpulsivityCost = MutableStateFlow<Double?>(null)
+    val convertedImpulsivityCost: StateFlow<Double?> = _convertedImpulsivityCost.asStateFlow()
+
+    private val _currentCurrency = MutableStateFlow("COP") // Moneda base por defecto
+    val currentCurrency: StateFlow<String> = _currentCurrency.asStateFlow()
+
+    fun convertImpulsivityCost(targetCurrency: String) {
+        viewModelScope.launch {
+            val amount = impulsivityCost.value
+            val result = exchangeRateRepository.convertAmount(amount, "COP", targetCurrency)
+            result.onSuccess {
+                _convertedImpulsivityCost.value = it
+                _currentCurrency.value = targetCurrency
+            }.onFailure {
+                // Manejar error si es necesario
+                _convertedImpulsivityCost.value = null
+            }
+        }
+    }
+
+    fun resetCurrency() {
+        _convertedImpulsivityCost.value = null
+        _currentCurrency.value = "COP"
+    }
 }
 
 class DashboardViewModelFactory(private val repository: TransactionRepository) : ViewModelProvider.Factory {
