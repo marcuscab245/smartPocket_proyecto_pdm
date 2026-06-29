@@ -9,16 +9,26 @@ import androidx.navigation.navArgument
 import com.example.smartpocket.ui.dashboard.DashboardScreen
 import com.example.smartpocket.ui.transaction.TransactionListScreen
 import com.example.smartpocket.ui.transaction.AddEditTransactionScreen
+import com.example.smartpocket.ui.auth.AuthScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: String = Screen.Dashboard.route
+    startDestination: String = Screen.Auth.route
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable(Screen.Auth.route) {
+            AuthScreen(
+                onAuthenticated = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Auth.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 onNavigateToTransactions = { navController.navigate(Screen.TransactionList.route) },
