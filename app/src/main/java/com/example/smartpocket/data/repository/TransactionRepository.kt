@@ -22,6 +22,10 @@ class TransactionRepository(private val transactionDao: TransactionDao) {
         transactionDao.deleteTransaction(transaction)
     }
 
+    suspend fun deleteAll() {
+        transactionDao.deleteAllTransactions()
+    }
+
     fun getTransactionsInRange(start: Long, end: Long): Flow<List<TransactionEntity>> {
         return transactionDao.getTransactionsByDateRange(start, end)
     }

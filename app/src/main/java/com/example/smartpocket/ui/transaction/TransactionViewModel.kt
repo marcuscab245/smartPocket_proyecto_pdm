@@ -71,6 +71,12 @@ class TransactionViewModel(private val repository: TransactionRepository) : View
             repository.delete(transaction)
         }
     }
+
+    fun deleteAllTransactions() {
+        viewModelScope.launch {
+            repository.deleteAll()
+        }
+    }
 }
 
 class TransactionViewModelFactory(private val repository: TransactionRepository) : ViewModelProvider.Factory {

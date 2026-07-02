@@ -7,11 +7,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,11 +38,57 @@ fun TransactionListScreen(
     )
 ) {
     val transactions by viewModel.transactions.collectAsState()
+    var showDeleteAllDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteAllDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAllDialog = false },
+            title = { Text("¿Vaciar historial?", fontWeight = FontWeight.Bold) },
+            text = { Text("Esta acción eliminará todas tus transacciones de forma permanente. ¿Estás seguro?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteAllTransactions()
+                        showDeleteAllDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = InnecesarioRed)
+                ) {
+                    Text("Vaciar todo", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAllDialog = false }) {
+                    Text("Cancelar", color = PureWhite)
+                }
+            },
+            containerColor = CardGrey,
+            titleContentColor = PureWhite,
+            textContentColor = SecondaryText
+        )
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Historial", fontWeight = FontWeight.Bold) },
+                actions = {
+                    if (transactions.isNotEmpty()) {
+                        TextButton(
+                            onClick = { showDeleteAllDialog = true }
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.DeleteSweep, 
+                                    contentDescription = null, 
+                                    tint = InnecesarioRed,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Vaciar", color = InnecesarioRed, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = DeepBlack)
             )
         },
