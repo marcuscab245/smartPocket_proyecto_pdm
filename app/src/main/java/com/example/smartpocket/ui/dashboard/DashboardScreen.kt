@@ -186,23 +186,38 @@ fun ImpulsivityCard(
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(
-                            text = { Text("Ver en Pesos (COP)") },
-                            onClick = { onReset(); showMenu = false }
-                        )
-                        DropdownMenuItem(
                             text = { Text("Ver en Dólares (USD)") },
-                            onClick = { onConvert("USD"); showMenu = false }
+                            onClick = { onReset(); showMenu = false }
                         )
                         DropdownMenuItem(
                             text = { Text("Ver en Euros (EUR)") },
                             onClick = { onConvert("EUR"); showMenu = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Ver en Pesos Mexicanos (MXN)") },
+                            onClick = { onConvert("MXN"); showMenu = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Ver en Yenes (JPY)") },
+                            onClick = { onConvert("JPY"); showMenu = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Ver en Pesos Colombianos (COP)") },
+                            onClick = { onConvert("COP"); showMenu = false }
                         )
                     }
                 }
             }
 
             AnimatedContent(targetState = convertedCost ?: cost, label = "costAnim") { displayAmount ->
-                val prefix = if (currency == "COP") "$" else if (currency == "USD") "USD " else "€"
+                val prefix = when (currency) {
+                    "USD" -> "$"
+                    "EUR" -> "€"
+                    "MXN" -> "MXN $"
+                    "JPY" -> "¥"
+                    "COP" -> "COP $"
+                    else -> "$currency "
+                }
                 Text(
                     text = "$prefix${String.format(Locale.US, "%.2f", displayAmount)}",
                     fontSize = 36.sp,
@@ -228,7 +243,7 @@ fun MonthlySummaryCard(monthlyExpenses: Double) {
         colors = CardDefaults.cardColors(containerColor = VitalGreenContainer)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Text("Gastos del Mes", style = MaterialTheme.typography.labelMedium, color = VitalGreen)
+            Text("Gastos del Mes (USD)", style = MaterialTheme.typography.labelMedium, color = VitalGreen)
             Text(
                 "$${String.format(Locale.US, "%.2f", monthlyExpenses)}",
                 style = MaterialTheme.typography.headlineLarge,
@@ -248,7 +263,7 @@ fun BalanceCard(income: Double, expenses: Double) {
         colors = CardDefaults.cardColors(containerColor = CardGrey)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text("Resumen General", style = MaterialTheme.typography.titleMedium, color = PureWhite, fontWeight = FontWeight.Bold)
+            Text("Resumen General (USD)", style = MaterialTheme.typography.titleMedium, color = PureWhite, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {

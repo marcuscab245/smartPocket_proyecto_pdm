@@ -71,18 +71,18 @@ class DashboardViewModel(
     private val _convertedImpulsivityCost = MutableStateFlow<Double?>(null)
     val convertedImpulsivityCost: StateFlow<Double?> = _convertedImpulsivityCost.asStateFlow()
 
-    private val _currentCurrency = MutableStateFlow("COP") // Moneda base por defecto
+    private val _currentCurrency = MutableStateFlow("USD") // Cambiado de COP a USD como moneda principal
     val currentCurrency: StateFlow<String> = _currentCurrency.asStateFlow()
 
     fun convertImpulsivityCost(targetCurrency: String) {
         viewModelScope.launch {
             val amount = impulsivityCost.value
-            val result = exchangeRateRepository.convertAmount(amount, "COP", targetCurrency)
+            // Ahora la conversión asume que el monto original está en USD
+            val result = exchangeRateRepository.convertAmount(amount, "USD", targetCurrency)
             result.onSuccess {
                 _convertedImpulsivityCost.value = it
                 _currentCurrency.value = targetCurrency
             }.onFailure {
-                // Manejar error si es necesario
                 _convertedImpulsivityCost.value = null
             }
         }
@@ -90,7 +90,7 @@ class DashboardViewModel(
 
     fun resetCurrency() {
         _convertedImpulsivityCost.value = null
-        _currentCurrency.value = "COP"
+        _currentCurrency.value = "USD"
     }
 }
 
